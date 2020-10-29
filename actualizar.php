@@ -1,60 +1,82 @@
 <?php
-include_once "clases/Estudiante.php";
+if(!empty($_GET)) {
+    $id = $_GET["id"];
 
-$id = $_POST["id"];
-$estudiante = new Estudiante();
-$estudiante->setId($id);
-$resultado = $estudiante->mostrarEstudiantesPorId();
+    include_once "clases/Usuario.php";
+    $usuario = new Usuario();
+    $usuario->setId($id);
+    $datosUsuario = $usuario->leerPorId();
 
-foreach ($resultado->fetchAll() as $item) {
-    ?>
-    <form method="post" action="<?= $_SERVER['PHP_SELF'] ?>">
-        <input type="number" name="codigo" placeholder="Ingrese codigo" value="<?= $item["codigo"] ?>"><br>
-        <input type="text" name="nombres" placeholder="Ingrese Nombres" value="<?= $item["nombres"] ?>"><br>
-        <input type="text" name="apellidos" placeholder="Ingrese Apellidos" value="<?= $item["apellidos"] ?>"><br>
-        <input type="number" name="telefono" placeholder="Ingrese Telefono" value="<?= $item["telefono"] ?>"><br>
-        <input type="email" name="correo" placeholder="Ingrese Correo" value="<?= $item["correo"] ?>"><br>
-        <input type="hidden" name="id" value="<?= $id ?>">
-        <select name="pa">
-            <option value="1"
-                <?php
-                if ($item["id_pa"] == 1) {
-                    echo "selected";
-                }
-                ?>
-            >
-                Sistemas
-            </option>
-            <option value="2"
-                <?php
-                if ($item["id_pa"] == 2) {
-                    echo "selected";
-                }
-                ?>
-            >
-                Civil
-            </option>
-        </select><br>
-        <input type="submit" name="submit" value="actualizar">
-    </form>
-    <?php
+    foreach ($datosUsuario as $item) {
+        $dni = $item["dni"];
+        $nombres = $item["nombres"];
+        $apellidos = $item["apellidos"];
+        $tipo = $item["tipo"];
+    }
 }
-
-if (isset($_POST["submit"])) {
-    $codigo = $_POST["codigo"];
+?>
+<form method="post" action="<?= $_SERVER["PHP_SELF"] ?>">
+    <input type="number" name="dni" placeholder="DNI"
+        <?php
+            if(isset($dni)){
+                echo "value = '$dni'";
+            }
+        ?>
+    ><br>
+    <input type="text" name="nombres" placeholder="nombres"
+        <?php
+        if(isset($nombres)){
+            echo "value = '$nombres'";
+        }
+        ?>
+    ><br>
+    <input type="text" name="apellidos" placeholder="apellidos"
+        <?php
+        if(isset($apellidos)){
+            echo "value = '$apellidos'";
+        }
+        ?>
+    ><br>
+    <select name="tipo">
+        <option value="admin"
+            <?php
+                if($tipo == "admin") {
+                    echo "selected";
+                }
+            ?>
+        >Administrador</option>
+        <option value="empleado"
+            <?php
+                if($tipo == "empleado") {
+                    echo "selected";
+                }
+            ?>
+        >Empleado</option>
+    </select><br>
+    <input type="hidden" name="id" value="<?=$id?>">
+    <input type="submit" name="submit" value="Actualizar">
+</form>
+<?php
+if (!empty($_POST)) {
+    $id = $_POST["id"];
+    $dni = $_POST["dni"];
     $nombres = $_POST["nombres"];
     $apellidos = $_POST["apellidos"];
-    $telefono = $_POST["telefono"];
-    $correo = $_POST["correo"];
-    $pa = $_POST["pa"];
-    $id = $_POST["id"];
+    $tipo = $_POST["tipo"];
 
-    $resultado = $estudiante->actualizar($id, $codigo, $nombres, $apellidos, $telefono, $correo, $pa);
+    include_once "clases/Usuario.php";
+    $usuario = new Usuario();
+    $usuario->setId($id);
+    $usuario->setDni($dni);
+    $usuario->setNombres($nombres);
+    $usuario->setApellidos($apellidos);
+    $usuario->setTipo($tipo);
+    $filas = $usuario->actualizar();
 
-    if ($resultado != 0) {
+    if ($filas != 0) {
         header("location: index.php");
     } else {
-        echo "Error: Informacion no actualizada";
+        // echo "No se ha guaractualizadodado";
+	echo "No se ha actualizado";
     }
-
 }

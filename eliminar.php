@@ -1,16 +1,13 @@
 <?php
-include_once "clases/Estudiante.php";
+$id = $_GET["id"];
 
-if (isset($_POST["submit"])) {
-    $id = $_POST["id"];
+include_once "clases/Usuario.php";
+$usuario = new Usuario();
+$usuario->setId($id);
+$filas = $usuario->eliminar();
 
-    $estudiante = new Estudiante();
-    $estudiante->setId($id);
-    $resultado = $estudiante->eliminar();
-
-    if ($resultado != 0) {
-        header("location: index.php");
-    } else {
-        echo "Error: Informacion no Eliminada";
-    }
+if ($filas != 0) {
+    header("location: index.php");
+} else {
+    echo "No se ha eliminado";
 }
